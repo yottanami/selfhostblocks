@@ -1,4 +1,4 @@
-{ pkgs, shb, ... }:
+{ pkgs, lib, shb, ... }:
 let
   port = 9096;
 
@@ -488,5 +488,67 @@ in
     };
 
     testScript = commonTestScript.access;
+  };
+
+  users = shb.test.runNixOSTest {
+    name = "homeassistant_user";
+
+    nodes.server = {
+      imports = [
+        basic
+        shb.test.certs
+        https
+      ];
+
+      specialisation.ldap.configuration = {
+        imports = [
+          shb.test.ldap
+          ldap
+        ];
+      };
+    };
+
+    nodes.client = {
+      imports = [
+        clientLoginLdap
+      ];
+      # test.init = true;
+      specialisation.ldap.configuration = {
+        # test.init = lib.mkForce false;
+      };
+    };
+
+    testScript =
+      args@{ nodes, ... }:
+      let
+        specializationsServer = "${nodes.server.system.build.toplevel}/specialisation";
+        specializationsClient = "${nodes.client.system.build.toplevel}/specialisation";
+      in
+      ''
+        def switch_to_specialization(name):
+            client.succeed('${specializationsClient}/ldap/bin/switch-to-configuration test')
+            server.succeed('${specializationsServer}/ldap/bin/switch-to-configuration test')
+            server.wait_for_unit("multi-user.target")
+            client.wait_for_unit("multi-user.target")
+
+        start_all()
+        server.wait_for_unit("multi-user.target")
+      ''
+      + commonTestScript.access (args)
+      + ''
+        switch_to_specialization("ldap")
+      ''
+      + (commonTestScript.access.override { init = false; }) (
+        lib.recursiveUpdate args {
+          nodes.server = nodes.server.specialisation.ldap.configuration;
+          nodes.client = nodes.client.specialisation.ldap.configuration;
+        }
+      )
+      + ''
+        users = json.loads(server.succeed("sqlite3 /var/lib/jellyfin/data/jellyfin.db -json 'SELECT * FROM Users;"))
+        print(json.dumps(users, indent=4))
+        devices = json.loads(server.succeed("sqlite3 /var/lib/jellyfin/data/jellyfin.db -json 'SELECT * FROM Devices;"))
+        print(json.dumps(devices, indent=4))
+      '';
   };
 }
