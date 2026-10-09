@@ -40,6 +40,7 @@ in
           ensureUsers = {
             "charlie" = {
               email = "charlie@example.com";
+              displayName = "Charlie Charlie";
               password.result = config.shb.hardcodedsecret."charlie".result;
             };
           };

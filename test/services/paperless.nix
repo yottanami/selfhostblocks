@@ -112,12 +112,14 @@ let
 
       shb.lldap.ensureUsers.paperless_test_user = {
         email = "paperless_user@example.com";
+        displayName = "Paperless User";
         groups = [ "paperless_user" ];
         password.result = config.shb.hardcodedsecret.ldappaperlessUserPassword.result;
       };
 
       shb.lldap.ensureUsers.regular_test_user = {
         email = "regular_user@example.com";
+        displayName = "Regular User";
         groups = [ ];
         password.result = config.shb.hardcodedsecret.ldapRegularUserPassword.result;
       };

@@ -33,6 +33,8 @@ Template:
   `mailserver.enableManageSieve = true` must complete the
   [upstream Sieve migration](https://nixos-mailserver.readthedocs.io/en/nixos-26.05/migrations.html#sieve-script-directory-migration)
   before setting `shb.mailserver.stateVersion = 5`.
+- `shb.lldap.ensureUsers.<name>.displayName` is now required.
+  Without it, Home Assistant's SSO login fails, so set it for every user listed in `ensureUsers`.
 
 ## User Facing Backwards Compatible Changes
 

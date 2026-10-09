@@ -189,11 +189,13 @@ in
                 ensureUsers = {
                   alice = {
                     email = "alice@example.com";
+                    displayName = "Alice Alice";
                     groups = [ "user_group" ];
                     password.result = config.shb.hardcodedsecret.alice.result;
                   };
                   charlie = {
                     email = "charlie@example.com";
+                    displayName = "Charlie Charlie";
                     groups = [ "other_group" ];
                     password.result = config.shb.hardcodedsecret.charlie.result;
                   };

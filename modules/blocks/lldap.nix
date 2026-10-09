@@ -213,9 +213,8 @@ in
               };
 
               displayName = mkOption {
-                type = types.nullOr types.str;
-                default = null;
-                description = "Display name.";
+                type = types.str;
+                description = "Display name. Required by some services, Home Assistant for example.";
               };
 
               firstName = mkOption {
